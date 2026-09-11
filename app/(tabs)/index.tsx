@@ -1,113 +1,69 @@
 import React, { useState } from 'react';
-import { FlatList, Image, Pressable, SectionList, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { FlatList, Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-const FEATURED = [
-  { id: '1', title: 'React Native', image: require('@/assets/images/react-logo.png'), tag: 'Hot' },
-  { id: '2', title: 'TypeScript', image: require('@/assets/images/partial-react-logo.png'), tag: 'Mới' },
-  { id: '3', title: 'UI/UX Design', image: require('@/assets/images/icon.png'), tag: '' },
-];
-
-const SECTIONS = [
-  {
-    title: 'Tin tức', data: [
-      { id: 'a', title: 'React Native ', time: '1 giờ trước' },
-      { id: 'b', title: 'Expo SDK 54 hỗ trợ React 19', time: '3 giờ trước' },
-    ],
-  },
-  {
-    title: 'Nổi bật', data: [
-      { id: 'c', title: 'Tối ưu hiệu năng React Native', time: '1 ngày trước' },
-      { id: 'd', title: 'Flexbox từ A đến Z', time: '2 ngày trước' },
-    ],
-  },
+const NOTES = [
+  { id: '1', title: 'Mua sắm cuối tuần', content: 'Sữa, bánh mì, trứng, rau củ...', time: '10:30' },
+  { id: '2', title: 'Ý tưởng dự án', content: 'Xây dựng app ghi chú với React Native', time: 'Hôm qua' },
+  { id: '3', title: 'Lịch họp', content: 'Họp nhóm lúc 9h sáng thứ 2', time: 'Hôm qua' },
+  { id: '4', title: 'Học React Native', content: 'Ôn lại FlatList, SectionList, StyleSheet', time: '28/8' },
+  { id: '5', title: 'Ghi nhớ', content: 'Uống đủ nước, tập thể dục mỗi ngày', time: '27/8' },
 ];
 
 export default function HomeScreen() {
-  const [liked, setLiked] = useState(false);
+  const [notes] = useState(NOTES);
 
   return (
     <SafeAreaView style={s.safe}>
+
       {/* Header */}
       <View style={s.header}>
-        <Text style={s.headerTitle}>Trang chủ</Text>
-        <Pressable onPress={() => setLiked(l => !l)}>
-          <Text style={{ fontSize: 22 }}>{liked ? '❤️' : '🤍'}</Text>
+        <View style={s.headerLeft}>
+          <Image source={require('@/assets/images/icon.png')} style={s.logo} resizeMode="contain" />
+          <View>
+            <Text style={s.appName}>NoteApp</Text>
+            <Text style={s.headerSub}>{notes.length} ghi chú</Text>
+          </View>
+        </View>
+        <Pressable style={s.addBtn}>
+          <Text style={s.addBtnText}>+ Thêm</Text>
         </Pressable>
       </View>
 
-      <ScrollView showsVerticalScrollIndicator={false}>
-        {/* Banner */}
-        <Image source={require('@/assets/images/splash-icon.png')} style={s.banner} resizeMode="cover" />
+      {/* Danh sách ghi chú */}
+      <FlatList
+        data={notes}
+        keyExtractor={i => i.id}
+        contentContainerStyle={s.list}
+        renderItem={({ item }) => (
+          <Pressable style={s.card}>
+            <View style={s.cardTop}>
+              <Text style={s.cardTitle} numberOfLines={1}>{item.title}</Text>
+              <Text style={s.cardTime}>{item.time}</Text>
+            </View>
+            <Text style={s.cardContent} numberOfLines={2}>{item.content}</Text>
+          </Pressable>
+        )}
+        ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
+      />
 
-        {/* Thông tin chính */}
-        <View style={s.infoBox}>
-          <Text style={s.infoTitle}>Chào mừng bạn 👋</Text>
-          <Text style={s.infoDesc}>Khám phá các khóa học và bài viết mới nhất.</Text>
-          <Pressable style={s.btn}><Text style={s.btnText}>Khám phá ngay</Text></Pressable>
-        </View>
-
-        {/* FlatList ngang */}
-        <Text style={s.groupTitle}>Nổi bật</Text>
-        <FlatList
-          data={FEATURED}
-          keyExtractor={i => i.id}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ paddingHorizontal: 16, gap: 12, marginBottom: 20 }}
-          renderItem={({ item }) => (
-            <Pressable style={s.card}>
-              <Image source={item.image} style={s.cardImg} resizeMode="cover" />
-              {item.tag ? <View style={s.tag}><Text style={s.tagText}>{item.tag}</Text></View> : null}
-              <Text style={s.cardTitle}>{item.title}</Text>
-            </Pressable>
-          )}
-        />
-
-        {/* SectionList */}
-        <Text style={s.groupTitle}>Bài viết</Text>
-        <SectionList
-          sections={SECTIONS}
-          keyExtractor={i => i.id}
-          scrollEnabled={false}
-          renderSectionHeader={({ section }) => (
-            <View style={s.secHeader}><Text style={s.secHeaderText}>{section.title}</Text></View>
-          )}
-          renderItem={({ item }) => (
-            <Pressable style={s.newsItem}>
-              <View style={{ flex: 1 }}>
-                <Text style={s.newsTitle}>{item.title}</Text>
-                <Text style={s.newsTime}>{item.time}</Text>
-              </View>
-              <Text style={{ fontSize: 20, color: '#ccc' }}>›</Text>
-            </Pressable>
-          )}
-        />
-        <View style={{ height: 32 }} />
-      </ScrollView>
     </SafeAreaView>
   );
 }
 
 const s = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: '#f5f6fa' },
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#fff', paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#eee' },
-  headerTitle: { fontSize: 20, fontWeight: 'bold', color: '#1a1a1a' },
-  banner: { width: '100%', height: 180 },
-  infoBox: { backgroundColor: '#fff', margin: 16, borderRadius: 12, padding: 16, elevation: 2 },
-  infoTitle: { fontSize: 18, fontWeight: 'bold', marginBottom: 6 },
-  infoDesc: { fontSize: 14, color: '#666', marginBottom: 14 },
-  btn: { backgroundColor: '#007AFF', borderRadius: 8, paddingVertical: 15, alignItems: 'center' },
-  btnText: { color: '#fff', fontWeight: '600', fontSize: 15 },
-  groupTitle: { fontSize: 16, fontWeight: '700', marginLeft: 16, marginBottom: 10 },
-  card: { width: 150, backgroundColor: '#fff', borderRadius: 10, overflow: 'hidden', elevation: 2 },
-  cardImg: { width: '100%', height: 90 },
-  cardTitle: { fontSize: 13, color: '#333', padding: 8 },
-  tag: { position: 'absolute', top: 6, left: 6, backgroundColor: '#FF3B30', borderRadius: 4, paddingHorizontal: 6, paddingVertical: 2 },
-  tagText: { color: '#fff', fontSize: 10, fontWeight: '700' },
-  secHeader: { backgroundColor: '#f0f4ff', paddingHorizontal: 16, paddingVertical: 8 },
-  secHeaderText: { fontSize: 13, fontWeight: '700', color: '#007AFF' },
-  newsItem: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#f0f0f0' },
-  newsTitle: { fontSize: 14, color: '#1a1a1a', marginBottom: 4 },
-  newsTime: { fontSize: 12, color: 'hsl(318, 66%, 50%)' },
+  safe: { flex: 1, backgroundColor: '#F0F4FF' },
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#fff', paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#D0D9F0' },
+  headerLeft: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  logo: { width: 40, height: 40, borderRadius: 10 },
+  appName: { fontSize: 17, fontWeight: 'bold', color: '#007AFF' },
+  headerSub: { fontSize: 12, color: '#888', marginTop: 2 },
+  addBtn: { backgroundColor: '#007AFF', borderRadius: 10, paddingHorizontal: 14, paddingVertical: 8 },
+  addBtnText: { color: '#fff', fontWeight: '700', fontSize: 14 },
+  list: { padding: 16 },
+  card: { backgroundColor: '#fff', borderRadius: 14, padding: 14, elevation: 2, shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 4 },
+  cardTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 },
+  cardTitle: { fontSize: 15, fontWeight: '700', color: '#1a1a1a', flex: 1, marginRight: 8 },
+  cardTime: { fontSize: 12, color: '#888' },
+  cardContent: { fontSize: 13, color: '#666', lineHeight: 18 },
 });
